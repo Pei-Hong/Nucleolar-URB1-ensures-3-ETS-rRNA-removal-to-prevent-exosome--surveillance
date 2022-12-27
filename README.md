@@ -71,11 +71,20 @@ deltaSHAPE v1.0
 ### 2.2 pre-processing
 * Remove PCR primers from `${sample}-F1R1_F3R3.fq.gz`
 ```
-for i in *_1P.fq.gz; do cutadapt -m 20 -g GGGTTTTAAGCAGGAGGTGT -g GTGTTGTTGCCATGGTAATCCTGC -g GGGTTTAGACCGTCGTGAGAC -g GCGGGCCGCCCCCCCCTCCA -G GGGTTTTAAGCAGGAGGTGT -G GTGTTGTTGCCATGGTAATCCTGC -G GGGTTTAGACCGTCGTGAGAC -G GCGGGCCGCCCCCCCCTCCA -o ${i%_1P.fq.gz}_1P.rmPrimer.fq.gz -p ${i%_1P.fq.gz}_2P.rmPrimer.fq.gz ${i}  ${i%_1P.fq.gz}_2P.fq.gz > ${i%_1P.fq.gz}.rmPrimer.log 2>&1; done
+for i in *_1P.fq.gz; do cutadapt -m 20 -g GGGTTTTAAGCAGGAGGTGT -g \
+ GTGTTGTTGCCATGGTAATCCTGC -g GGGTTTAGACCGTCGTGAGAC -g GCGGGCCGCCCCCCCCTCCA \
+ -G GGGTTTTAAGCAGGAGGTGT -G GTGTTGTTGCCATGGTAATCCTGC -G \
+ GGGTTTAGACCGTCGTGAGAC -G GCGGGCCGCCCCCCCCTCCA \
+ -o ${i%_1P.fq.gz}_1P.rmPrimer.fq.gz \
+ -p ${i%_1P.fq.gz}_2P.rmPrimer.fq.gz ${i}  ${i%_1P.fq.gz}_2P.fq.gz \
+ > ${i%_1P.fq.gz}.rmPrimer.log 2>&1; done
 ```
 * Remove PCR primers from `${sample}-F4R4.fq.gz`
 ```
-for i in *_1P.fq.gz; do cutadapt -g GGCCTCGGATAGCCGGTCCC -g GGCCCGGCGGGCGTGCGCGT -G GGCCTCGGATAGCCGGTCCC -G GGCCCGGCGGGCGTGCGCGT -o ${i%_1P.fq.gz}_1P.rmPrimer.fq.gz -p ${i%_1P.fq.gz}_2P.rmPrimer.fq.gz ${i} ${i%_1P.fq.gz}_2P.fq.gz > ${i%_1P.fq.gz}.trimprimer.log 2>&1 ; done
+for i in *_1P.fq.gz; do cutadapt -g GGCCTCGGATAGCCGGTCCC -g \
+GGCCCGGCGGGCGTGCGCGT -G GGCCTCGGATAGCCGGTCCC -G GGCCCGGCGGGCGTGCGCGT \
+-o ${i%_1P.fq.gz}_1P.rmPrimer.fq.gz -p ${i%_1P.fq.gz}_2P.rmPrimer.fq.gz \
+${i} ${i%_1P.fq.gz}_2P.fq.gz > ${i%_1P.fq.gz}.trimprimer.log 2>&1 ; done
 ```
 * Combine `${sample}-F1R1_F3R3.fq.gz` `${sample}-F4R4.fq.gz`
 ```
@@ -83,15 +92,30 @@ zcat ${sample}-F1R1_F3R3.fq.gz ${sample}-F4R4.fq.gz | gzip > ${sample}.comb.fq.g
 ```
 * shapemapper
 ```
-for treat in SCR KD1 KD4; do for rep in NAI-1 NAI-2 ; do  echo ${rep}-${treat}$'\t'DMSO-${treat}$'\t'DC-${treat}; shapemapper --overwrite --name ${rep}-${treat} --target ../F1R1_F3R3_F4R4.fa --out ${rep}-${treat} --verbose --serial  --nproc 25 --min-depth 1000 --modified --R1 ${rep}-${treat}_1P.rmPrimer.comb.fq.gz --R2 ${rep}-${treat}_2P.rmPrimer.comb.fq.gz --untreated --R1 DMSO-${treat}_1P.rmPrimer.comb.fq.gz --R2 DMSO-${treat}_2P.rmPrimer.comb.fq.gz --denatured --R1 DC-${treat}_1P.rmPrimer.comb.fq.gz --R2 DC-${treat}_2P.rmPrimer.comb.fq.gz > ${rep}-${treat}.log 2>&1 ; done ; done
+for treat in SCR KD1 KD4; do 
+    for rep in NAI-1 NAI-2 ; do 
+        hapemapper --overwrite --name ${rep}-${treat} --target ../F1R1_F3R3_F4R4.fa \
+        --out ${rep}-${treat} --verbose --serial  --nproc 25 --min-depth 1000 \
+        --modified --R1 ${rep}-${treat}_1P.rmPrimer.comb.fq.gz --R2 ${rep}-${treat}_2P.rmPrimer.comb.fq.gz \
+        --untreated --R1 DMSO-${treat}_1P.rmPrimer.comb.fq.gz --R2 DMSO-${treat}_2P.rmPrimer.comb.fq.gz \
+        --denatured --R1 DC-${treat}_1P.rmPrimer.comb.fq.gz --R2 DC-${treat}_2P.rmPrimer.comb.fq.gz \
+        > ${rep}-${treat}.log 2>&1
+    done
+done
 ```
 * Predict RNA secondary structure
 ```
-for i in */*_F1R1_F3R3_F4R4.shape ; do shape2struc.py -s ${i} -f ../F1R1_F3R3_F4R4.fa -o ${i%.shape} ; done > log 2>&1 &
+for i in */*_F1R1_F3R3_F4R4.shape ; do 
+    shape2struc.py -s ${i} -f ../F1R1_F3R3_F4R4.fa -o ${i%.shape}
+done > log 2>&1 &
 ```
 * deltaSHAPE
 ```
-for rep in 1 2 ; do for kd in KD1 KD4; do echo " deltaSHAPE.py NAI-${rep}-${kd}_F1R1_F3R3_F4R4.map NAI-${rep}-SCR_F1R1_F3R3_F4R4.map -o p5/NAI-${rep}-${kd}.txt --all --colorfill --noshow --pdf -p 5 -z 0 -s 0 "; done; done > deltaSHAPE.sh
+for rep in 1 2 ; do 
+    for kd in KD1 KD4; do 
+        echo "deltaSHAPE.py NAI-${rep}-${kd}_F1R1_F3R3_F4R4.map NAI-${rep}-SCR_F1R1_F3R3_F4R4.map -o p5/NAI-${rep}-${kd}.txt --all --colorfill --noshow --pdf -p 5 -z 0 -s 0 "
+    done
+done > deltaSHAPE.sh
 cat deltaSHAPE.sh | parallel -j 3
 ```
 ## 3.Distribution analysis of proteins of interest (POIs)
