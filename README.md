@@ -97,8 +97,5 @@ cat deltaSHAPE.sh | parallel -j 3
 ## 3.Distribution analysis of proteins of interest (POIs)
 * Each POI expression plasmid was transfected and co-imaged with mRuby3-DKC1 and mTagBFP2-NPM1 by epifluorescence microscope (DeltaVision Elite). The 3D stacks were imported into Fiji/ImageJ and analyzed by an in-house ImageJ script `20221226_Nuc_Classifier.ijm`.
 
-## 4. Citation
-Lin Shan#, Guang Xu#, Run-Wen Yao, Peng-Fei Luan, You-Kui Huang, Pei-Hong Zhang, Yu-Hang Pan, Lin Zhang, Xiang Gao, Ying Li, Shi-Meng Cao, Shuai-Xin Gao, Zheng-Hu Yang, Si-Qi Li, Liang-Zhong Yang, Ying Wang, Catharine C.L. Wong Chen, Li Yu, Jin-Song Li, Li Yang, Ling-Ling Chen. Nucleolar URB1 ensures 3' ETS rRNA removal to prevent exosome-surveillance. Nature, 2022.
-
-## 5. License
+## 4. License
 Copyright (C) 2022 YangLab. Licensed GPLv3 for open source use or contact YangLab (yanglab@@picb.ac.cn) for commercial use.
